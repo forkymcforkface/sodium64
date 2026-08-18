@@ -221,6 +221,38 @@ exception_handler:
 
 .align 5
 vi_interrupt:
+    lui k1, 0xB1FF
+    lw k1, 0(k1)
+    beqz k1, igr_ack
+    nop
+    lbu k0, UNCACHED(joybus_cmd + 2)
+    andi k0, k0, 0xC0
+    bnez k0, igr_decay
+    nop
+    lhu k0, UNCACHED(joybus_cmd + 4)
+    and k0, k0, k1
+    bne k0, k1, igr_decay
+    nop
+    la k1, igr_hold
+    lw k0, (k1)
+    addi k0, k0, 1
+    sw k0, (k1)
+    lui k1, 0xB1FF
+    lw k1, 4(k1)
+    slt k0, k0, k1
+    bnez k0, igr_ack
+    nop
+    j igr_reboot
+    nop
+igr_decay:
+    la k1, igr_hold
+    lw k0, (k1)
+    beqz k0, igr_ack
+    addi k0, k0, -1
+    sw k0, (k1)
+igr_ack:
+
+
     // Acknowledge the VI interrupt
     lui k0, 0xA440
     sw zero, 0x0010(k0) // VI_CURRENT

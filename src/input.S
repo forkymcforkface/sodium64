@@ -28,6 +28,7 @@
 .globl read_joyxl
 .globl read_joyxh
 .globl write_joywr
+.globl joybus_cmd
 
 .data
 
